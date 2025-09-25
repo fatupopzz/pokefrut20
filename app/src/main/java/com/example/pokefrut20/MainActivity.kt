@@ -22,8 +22,6 @@ import com.example.pokefrut20.ui.theme.PokeFrutTheme
 
 /**
  * Activity principal de PokeFrut 2.0
- * Implementa Clean Architecture desde el punto de entrada
- * Maneja el tema, navegación y estructura general de la app con fondo Frutiger Aero
  */
 class MainActivity : ComponentActivity() {
 
@@ -79,14 +77,10 @@ private fun PokeFrutApp() {
 
 /**
  * Determina el título de la pantalla basado en la ruta actual
- * Función pura que facilita el testing
- *
- * @param currentRoute Ruta actual de navegación
- * @return Título apropiado para la pantalla
  */
 private fun determineScreenTitle(currentRoute: String?): String {
     return when {
-        currentRoute == NavigationRoutes.POKEMON_LIST -> "PokéFrut 2.0"
+        currentRoute == NavigationRoutes.POKEMON_LIST -> "Pokedex"
         currentRoute?.startsWith("pokemon_detail") == true -> "Detalles del Pokémon"
         else -> "PokéFrut 2.0"
     }
