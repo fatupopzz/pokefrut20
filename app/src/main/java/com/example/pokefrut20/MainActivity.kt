@@ -11,15 +11,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.pokefrut20.navigation.NavigationRoutes
+import com.example.pokefrut20.ui.components.FrutigerAeroBackground
 import com.example.pokefrut20.ui.components.PokeFrutAppBar
 import com.example.pokefrut20.ui.navigation.AppNavigation
 import com.example.pokefrut20.ui.theme.PokeFrutTheme
 
 /**
  * Activity principal de PokeFrut 2.0
+ * Implementa Clean Architecture desde el punto de entrada
+ * Maneja el tema, navegación y estructura general de la app con fondo Frutiger Aero
  */
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
 /**
  * Composable principal de la aplicación
- * Configura la estructura general con Scaffold y navegación
+ * Configura la estructura general con Scaffold, navegación y fondo Frutiger Aero
  */
 @Composable
 private fun PokeFrutApp() {
@@ -47,22 +51,28 @@ private fun PokeFrutApp() {
     // Determinar el título basado en la ruta actual
     val screenTitle = determineScreenTitle(currentRoute)
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    // Fondo Frutiger Aero con tu imagen personalizada
+    FrutigerAeroBackground(
+        backgroundAlpha = 0.8f // Ajusta la transparencia si es necesario
     ) {
-        Scaffold(
-            topBar = {
-                PokeFrutAppBar(
-                    title = screenTitle,
-                    navController = navController
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Transparent // Hacer el Surface transparente
+        ) {
+            Scaffold(
+                containerColor = Color.Transparent, // Hacer el Scaffold transparente
+                topBar = {
+                    PokeFrutAppBar(
+                        title = screenTitle,
+                        navController = navController
+                    )
+                }
+            ) { paddingValues ->
+                AppNavigation(
+                    navController = navController,
+                    modifier = Modifier.padding(paddingValues)
                 )
             }
-        ) { paddingValues ->
-            AppNavigation(
-                navController = navController,
-                modifier = Modifier.padding(paddingValues)
-            )
         }
     }
 }

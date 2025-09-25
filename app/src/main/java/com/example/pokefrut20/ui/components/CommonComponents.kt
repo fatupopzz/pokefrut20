@@ -19,6 +19,11 @@ import androidx.navigation.NavController
  * Cada componente tiene una responsabilidad específica
  */
 
+/**
+ * TopAppBar personalizada para la aplicación
+ * Maneja navegación automática hacia atrás
+ * Optimizada para fondo Frutiger Aero
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokeFrutAppBar(
@@ -35,7 +40,7 @@ fun PokeFrutAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF6650a4).copy(alpha = 0.9f)
+            containerColor = Color(0x9A00BCD4).copy(alpha = 0.9f) // Semi-transparente
         ),
         navigationIcon = {
             // Solo mostrar botón de regreso si hay pantalla anterior
