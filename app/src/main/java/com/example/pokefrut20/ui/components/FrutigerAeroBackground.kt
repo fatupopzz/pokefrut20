@@ -26,7 +26,7 @@ fun FrutigerAeroBackground(
 
         Image(
             painter = painterResource(id = R.drawable.frutiger_background),
-            contentDescription = "Frutiger Aero Background",
+            contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(backgroundAlpha),

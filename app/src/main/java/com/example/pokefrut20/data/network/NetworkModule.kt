@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Módulo de configuración de red
- * Singleton para manejo eficiente de recursos de red
  */
 object NetworkModule {
 

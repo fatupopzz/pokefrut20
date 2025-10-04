@@ -8,7 +8,6 @@ import retrofit2.http.Query
 
 /**
  * Interfaz para las llamadas a la PokéAPI
- * Siguiendo principios Clean Code: nombres descriptivos y funciones específicas
  */
 interface PokemonApiService {
 

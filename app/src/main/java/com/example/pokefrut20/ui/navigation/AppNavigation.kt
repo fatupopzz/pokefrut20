@@ -28,7 +28,7 @@ fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ) {
-    // Crear instancia del repository (en una app real usaríamos DI como Hilt)
+    // Crear instancia del repository
     val repository = createPokemonRepository()
 
     NavHost(
@@ -73,7 +73,6 @@ fun AppNavigation(
 
 /**
  * Factory function para crear el repository
- * En una app real esto estaría en un módulo de DI
  */
 @Composable
 private fun createPokemonRepository(): PokemonRepository {
@@ -82,7 +81,6 @@ private fun createPokemonRepository(): PokemonRepository {
 
 /**
  * Factory function para crear el ViewModel de la lista
- * En una app real usaríamos @HiltViewModel o ViewModelProvider
  */
 @Composable
 private fun createPokemonListViewModel(repository: PokemonRepository): PokemonListViewModel {
@@ -93,7 +91,6 @@ private fun createPokemonListViewModel(repository: PokemonRepository): PokemonLi
 
 /**
  * Factory function para crear el ViewModel de detalles
- * En una app real usaríamos @HiltViewModel o ViewModelProvider
  */
 @Composable
 private fun createPokemonDetailViewModel(repository: PokemonRepository): PokemonDetailViewModel {

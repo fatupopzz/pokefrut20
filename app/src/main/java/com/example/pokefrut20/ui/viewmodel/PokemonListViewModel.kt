@@ -81,7 +81,6 @@ class PokemonListViewModel(
 
 /**
  * Estado de la UI para la lista de Pokémon
- * Data class inmutable que representa todos los estados posibles
  */
 data class PokemonListUiState(
     val isLoading: Boolean = false,
