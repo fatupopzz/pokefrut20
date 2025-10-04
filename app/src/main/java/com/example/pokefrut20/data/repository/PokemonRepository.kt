@@ -2,7 +2,7 @@ package com.example.pokefrut20.data.repository
 
 import com.example.pokefrut20.data.model.PokemonBasic
 import com.example.pokefrut20.data.model.PokemonDetail
-import com.example.pokefrut20.data.network.PokemonApiService
+import com.example.pokefrut20.data.remote.PokemonApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.pokefrut20.data.network.NetworkModule
+import com.example.pokefrut20.data.remote.RetrofitClient
 import com.example.pokefrut20.data.repository.PokemonRepository
 import com.example.pokefrut20.navigation.NavigationRoutes
 import com.example.pokefrut20.ui.components.PokemonDetailScreen
@@ -18,17 +18,14 @@ import com.example.pokefrut20.ui.viewmodel.PokemonListViewModel
 
 /**
  * Configuración principal de navegación de la aplicación
- * Implementa patrón de navegación limpio con inyección de dependencias manual
- *
- * @param navController Controlador de navegación
- * @param modifier Modificador de Compose
+ * Implementa el patrón de navegación con Jetpack Compose Navigation
  */
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ) {
-    // Crear instancia del repository
+    // Crear instancia del repository usando RetrofitClient
     val repository = createPokemonRepository()
 
     NavHost(
@@ -36,7 +33,7 @@ fun AppNavigation(
         startDestination = NavigationRoutes.POKEMON_LIST,
         modifier = modifier
     ) {
-        // Pantalla de lista de Pokémon (pantalla principal)
+        // Pantalla de lista de Pokémon
         composable(route = NavigationRoutes.POKEMON_LIST) {
             val viewModel = createPokemonListViewModel(repository)
 
@@ -73,10 +70,11 @@ fun AppNavigation(
 
 /**
  * Factory function para crear el repository
+ * Usa RetrofitClient como fuente de datos
  */
 @Composable
 private fun createPokemonRepository(): PokemonRepository {
-    return PokemonRepository(NetworkModule.pokemonApiService)
+    return PokemonRepository(RetrofitClient.apiService)
 }
 
 /**

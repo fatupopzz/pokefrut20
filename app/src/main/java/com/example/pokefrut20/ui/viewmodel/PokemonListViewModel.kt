@@ -11,16 +11,16 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel para la pantalla de lista de Pokémon
- * Maneja el estado de la UI siguiendo patrón MVVM
+ * Implementa MVVM exponiendo el estado mediante StateFlow
  */
 class PokemonListViewModel(
     private val repository: PokemonRepository
 ) : ViewModel() {
 
     // Estado privado mutable
-    private val _uiState = MutableStateFlow(PokemonListUiState())
+    private val _uiState = MutableStateFlow<PokemonListUiState>(PokemonListUiState.Loading)
 
-    // Estado público inmutable
+    // Estado público inmutable expuesto a la UI
     val uiState: StateFlow<PokemonListUiState> = _uiState.asStateFlow()
 
     init {
@@ -29,23 +29,23 @@ class PokemonListViewModel(
 
     /**
      * Carga la lista de Pokémon desde el repository
+     * Maneja los estados: Loading, Success, Error
      */
     fun loadPokemonList() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.value = PokemonListUiState.Loading
 
             repository.getPokemonList()
                 .onSuccess { pokemonList ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        pokemonList = pokemonList,
-                        errorMessage = null
-                    )
+                    _uiState.value = if (pokemonList.isEmpty()) {
+                        PokemonListUiState.Empty
+                    } else {
+                        PokemonListUiState.Success(pokemonList)
+                    }
                 }
                 .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = getErrorMessage(exception)
+                    _uiState.value = PokemonListUiState.Error(
+                        message = getErrorMessage(exception)
                     )
                 }
         }
@@ -59,14 +59,7 @@ class PokemonListViewModel(
     }
 
     /**
-     * Limpiar mensaje de error
-     */
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(errorMessage = null)
-    }
-
-    /**
-     * Convierte excepciones en mensajes de error amigables
+     * Convierte excepciones en mensajes de error amigables para el usuario
      */
     private fun getErrorMessage(exception: Throwable): String {
         return when {
@@ -74,22 +67,20 @@ class PokemonListViewModel(
                 "Error de conexión. Revisa tu internet."
             exception.message?.contains("timeout", ignoreCase = true) == true ->
                 "La conexión tardó demasiado. Inténtalo de nuevo."
-            else -> "Error al cargar los Pokémon. Inténtalo de nuevo."
+            exception.message?.contains("404", ignoreCase = true) == true ->
+                "Recurso no encontrado."
+            else -> "Error al cargar los Pokémon: ${exception.message ?: "Error desconocido"}"
         }
     }
 }
 
 /**
- * Estado de la UI para la lista de Pokémon
+ * Estados posibles de la UI para la lista de Pokémon
+ * Sealed class para representar todos los estados de forma exhaustiva
  */
-data class PokemonListUiState(
-    val isLoading: Boolean = false,
-    val pokemonList: List<PokemonBasic> = emptyList(),
-    val errorMessage: String? = null
-) {
-    val isEmpty: Boolean
-        get() = pokemonList.isEmpty() && !isLoading && errorMessage == null
-
-    val hasError: Boolean
-        get() = errorMessage != null
+sealed class PokemonListUiState {
+    data object Loading : PokemonListUiState()
+    data class Success(val pokemonList: List<PokemonBasic>) : PokemonListUiState()
+    data class Error(val message: String) : PokemonListUiState()
+    data object Empty : PokemonListUiState()
 }
