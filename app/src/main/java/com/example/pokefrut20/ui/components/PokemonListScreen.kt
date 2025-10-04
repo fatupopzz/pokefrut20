@@ -10,20 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.pokefrut20.data.model.PokemonBasic
+import com.example.pokefrut20.ui.viewmodel.PokemonListUiState
 import com.example.pokefrut20.ui.viewmodel.PokemonListViewModel
 
 /**
  * Pantalla principal que muestra la lista de Pokémon
- * Implementa Clean Code: funciones pequeñas, nombres descriptivos
- *
- * @param viewModel ViewModel que maneja el estado
- * @param onPokemonClick Callback cuando se hace click en un Pokémon
- * @param modifier Modificador de Compose
+ * Observa el StateFlow del ViewModel para reaccionar a cambios de estado
  */
 @Composable
 fun PokemonListScreen(
@@ -34,24 +30,24 @@ fun PokemonListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> {
+        when (val state = uiState) {
+            is PokemonListUiState.Loading -> {
                 LoadingIndicator()
             }
-            uiState.hasError -> {
+            is PokemonListUiState.Success -> {
+                PokemonList(
+                    pokemonList = state.pokemonList,
+                    onPokemonClick = onPokemonClick
+                )
+            }
+            is PokemonListUiState.Error -> {
                 ErrorState(
-                    message = uiState.errorMessage ?: "Error desconocido",
+                    message = state.message,
                     onRetry = viewModel::retryLoading
                 )
             }
-            uiState.isEmpty -> {
+            is PokemonListUiState.Empty -> {
                 EmptyState(onRetry = viewModel::retryLoading)
-            }
-            else -> {
-                PokemonList(
-                    pokemonList = uiState.pokemonList,
-                    onPokemonClick = onPokemonClick
-                )
             }
         }
     }

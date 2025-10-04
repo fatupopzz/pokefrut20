@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.pokefrut20.data.model.PokemonDetail
+import com.example.pokefrut20.ui.viewmodel.PokemonDetailUiState
 import com.example.pokefrut20.ui.viewmodel.PokemonDetailViewModel
 
 /**
@@ -39,18 +40,18 @@ fun PokemonDetailScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> {
+        when (val state = uiState) {
+            is PokemonDetailUiState.Loading -> {
                 LoadingIndicator()
             }
-            uiState.hasError -> {
+            is PokemonDetailUiState.Error -> {
                 ErrorState(
-                    message = uiState.errorMessage ?: "Error desconocido",
+                    message = state.message,
                     onRetry = { viewModel.retryLoading(pokemonId) }
                 )
             }
-            uiState.hasData -> {
-                PokemonDetailContent(pokemon = uiState.pokemonDetail!!)
+            is PokemonDetailUiState.Success -> {
+                PokemonDetailContent(pokemon = state.pokemonDetail)
             }
         }
     }

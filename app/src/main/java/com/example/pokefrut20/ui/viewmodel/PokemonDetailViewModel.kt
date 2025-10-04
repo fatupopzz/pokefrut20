@@ -18,7 +18,7 @@ class PokemonDetailViewModel(
 ) : ViewModel() {
 
     // Estado privado mutable
-    private val _uiState = MutableStateFlow(PokemonDetailUiState())
+    private val _uiState = MutableStateFlow<PokemonDetailUiState>(PokemonDetailUiState.Loading)
 
     // Estado público inmutable
     val uiState: StateFlow<PokemonDetailUiState> = _uiState.asStateFlow()
@@ -29,20 +29,15 @@ class PokemonDetailViewModel(
      */
     fun loadPokemonDetail(pokemonId: Int) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.value = PokemonDetailUiState.Loading
 
             repository.getPokemonDetail(pokemonId)
                 .onSuccess { pokemonDetail ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        pokemonDetail = pokemonDetail,
-                        errorMessage = null
-                    )
+                    _uiState.value = PokemonDetailUiState.Success(pokemonDetail)
                 }
                 .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = getErrorMessage(exception)
+                    _uiState.value = PokemonDetailUiState.Error(
+                        message = getErrorMessage(exception)
                     )
                 }
         }
@@ -56,13 +51,6 @@ class PokemonDetailViewModel(
     }
 
     /**
-     * Limpiar mensaje de error
-     */
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(errorMessage = null)
-    }
-
-    /**
      * Convierte excepciones en mensajes de error amigables
      */
     private fun getErrorMessage(exception: Throwable): String {
@@ -73,23 +61,17 @@ class PokemonDetailViewModel(
                 "Error de conexión. Revisa tu internet."
             exception.message?.contains("timeout", ignoreCase = true) == true ->
                 "La conexión tardó demasiado. Inténtalo de nuevo."
-            else -> "Error al cargar el Pokémon. Inténtalo de nuevo."
+            else -> "Error al cargar el Pokémon: ${exception.message ?: "Error desconocido"}"
         }
     }
 }
 
 /**
- * Estado de la UI para los detalles del Pokémon
- * Data class inmutable que representa todos los estados posibles
+ * Estados posibles de la UI para los detalles del Pokémon
+ * Sealed class para representar todos los estados posibles
  */
-data class PokemonDetailUiState(
-    val isLoading: Boolean = false,
-    val pokemonDetail: PokemonDetail? = null,
-    val errorMessage: String? = null
-) {
-    val hasData: Boolean
-        get() = pokemonDetail != null
-
-    val hasError: Boolean
-        get() = errorMessage != null
+sealed class PokemonDetailUiState {
+    data object Loading : PokemonDetailUiState()
+    data class Success(val pokemonDetail: PokemonDetail) : PokemonDetailUiState()
+    data class Error(val message: String) : PokemonDetailUiState()
 }
